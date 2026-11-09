@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>A2 词卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one narrow column, phone-first; the card is the only object with a frame. */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --fg:#18202B; --muted:#5E6B7C; --line:#DCE2EA;
+  --accent:#1D4ED8; --accent-soft:#E3EAFB; --sun:#C2410C;
+  --again:#B42318; --hard:#B54708; --good:#067647;
+  --display:"Bricolage Grotesque","Noto Sans SC",system-ui,sans-serif;
+  --body:"Noto Sans SC",-apple-system,"PingFang SC",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F141B; --surface:#18202B; --fg:#E8EDF3; --muted:#9AA7B8; --line:#2A3442;
+  --accent:#7EA2F7; --accent-soft:#1D2A44; --sun:#F59E5B;
+  --again:#F97066; --hard:#FDB022; --good:#47CD89; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F141B; --surface:#18202B; --fg:#E8EDF3; --muted:#9AA7B8; --line:#2A3442;
+  --accent:#7EA2F7; --accent-soft:#1D2A44; --sun:#F59E5B;
+  --again:#F97066; --hard:#FDB022; --good:#47CD89; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:520px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-size:28px;font-weight:700;margin:0;letter-spacing:-.01em}
+h1 span{color:var(--sun)}
+.countdown{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{padding:10px 0;border-top:2px solid var(--line)}
+.stat b{display:block;font-family:var(--display);font-size:26px;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat small{color:var(--muted);font-size:12px;letter-spacing:.04em}
+.stat.due{border-color:var(--accent)} .stat.due b{color:var(--accent)}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px}
+button:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.primary{background:var(--accent);color:var(--surface);font-weight:700;padding:16px;font-size:17px;width:100%}
+.primary:disabled{opacity:.45;cursor:default}
+.decks{display:flex;flex-direction:column;gap:0}
+.deck{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.deck .wk{font-family:var(--display);font-weight:700;color:var(--muted);font-size:13px;letter-spacing:.06em}
+.deck .nm{font-weight:500}
+.deck .bar{grid-column:2/4;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.deck .bar i{display:block;height:100%;background:var(--good)}
+.deck .ct{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.section-label{font-size:12px;color:var(--muted);letter-spacing:.08em;margin:0}
+.settings{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;color:var(--muted)}
+select{font:inherit;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+/* study */
+.study{display:flex;flex-direction:column;gap:16px;min-height:calc(100% - 0px)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ghost{background:transparent;color:var(--muted);padding:8px 4px;font-size:15px}
+.progress{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.left{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px 22px;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.dir{font-size:12px;letter-spacing:.08em;color:var(--sun);font-weight:700}
+.es{font-family:var(--display);font-size:clamp(28px,8vw,38px);font-weight:700;line-height:1.2;text-wrap:balance;overflow-wrap:anywhere}
+.zh{font-size:24px;font-weight:500;text-wrap:balance}
+.hint{color:var(--muted);font-size:14px}
+.ex{color:var(--muted);font-size:16px;font-style:italic;max-width:34ch}
+.say{background:var(--accent-soft);color:var(--accent);padding:8px 14px;font-size:14px;font-weight:500}
+hr{width:60%;border:0;border-top:1px dashed var(--line);margin:4px 0}
+.grades{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grades button{padding:14px 6px;background:var(--surface);border:1.5px solid var(--line);color:var(--fg);display:flex;flex-direction:column;gap:2px;align-items:center}
+.grades b{font-size:16px}
+.grades small{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.g0 b{color:var(--again)} .g1 b{color:var(--hard)} .g2 b{color:var(--good)}
+.done{text-align:center;padding:40px 0;display:flex;flex-direction:column;gap:12px;align-items:center}
+.done h2{font-family:var(--display);font-size:26px;margin:0}
+.done p{color:var(--muted);margin:0}
+.note{font-size:12px;color:var(--muted);text-align:center;margin:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const WEEKS = [{"week": 1, "title": "个人信息与职业", "words": [{"es": "hola", "zh": "你好", "ex": "¡Hola! ¿Qué tal?"}, {"es": "adiós", "zh": "再见", "ex": "Adiós, hasta mañana."}, {"es": "buenos días", "zh": "早上好", "ex": "Buenos días, señora."}, {"es": "buenas tardes", "zh": "下午好", "ex": "Buenas tardes, ¿cómo está?"}, {"es": "buenas noches", "zh": "晚上好；晚安", "ex": "Buenas noches, hasta mañana."}, {"es": "por favor", "zh": "请", "ex": "Un café, por favor."}, {"es": "gracias", "zh": "谢谢", "ex": "Muchas gracias."}, {"es": "de nada", "zh": "不客气", "ex": "—Gracias. —De nada."}, {"es": "perdón", "zh": "对不起；打扰一下", "ex": "Perdón, ¿dónde está el baño?"}, {"es": "hasta luego", "zh": "回头见", "ex": "Hasta luego, Ana."}, {"es": "llamarse", "zh": "名叫", "ex": "Me llamo Wang Li."}, {"es": "¿Cómo te llamas?", "zh": "你叫什么名字？", "ex": "—¿Cómo te llamas? —Me llamo Ana."}, {"es": "el nombre", "zh": "名字", "ex": "Mi nombre es Carlos."}, {"es": "el apellido", "zh": "姓", "ex": "Mi apellido es Wang."}, {"es": "la edad", "zh": "年龄", "ex": "¿Cuál es tu edad?"}, {"es": "¿Cuántos años tienes?", "zh": "你多大了？", "ex": "—¿Cuántos años tienes? —Tengo 30 años."}, {"es": "la dirección", "zh": "地址", "ex": "¿Cuál es tu dirección?"}, {"es": "el número de teléfono", "zh": "电话号码", "ex": "Mi número de teléfono es el 612 345 678."}, {"es": "el correo electrónico", "zh": "电子邮件", "ex": "Te escribo un correo electrónico."}, {"es": "ser", "zh": "是（身份、国籍、性格）", "ex": "Soy chino. Soy estudiante."}, {"es": "estar", "zh": "在；处于（位置、状态）", "ex": "Estoy en casa. Estoy cansado."}, {"es": "tener", "zh": "有", "ex": "Tengo dos hermanos."}, {"es": "vivir", "zh": "住；生活", "ex": "Vivo en Shanghái."}, {"es": "hablar", "zh": "说（语言）", "ex": "Hablo chino y un poco de español."}, {"es": "trabajar", "zh": "工作", "ex": "Trabajo en una empresa."}, {"es": "estudiar", "zh": "学习", "ex": "Estudio español todos los días."}, {"es": "aprender", "zh": "学；学会", "ex": "Quiero aprender español."}, {"es": "escribir", "zh": "写", "ex": "Escribo un correo a mi amigo."}, {"es": "leer", "zh": "读", "ex": "Leo un libro."}, {"es": "comer", "zh": "吃", "ex": "Comemos a la una."}, {"es": "beber", "zh": "喝", "ex": "Bebo agua."}, {"es": "el país", "zh": "国家", "ex": "¿De qué país eres?"}, {"es": "la ciudad", "zh": "城市", "ex": "Mi ciudad es muy grande."}, {"es": "¿De dónde eres?", "zh": "你是哪里人？", "ex": "—¿De dónde eres? —Soy de China."}, {"es": "China", "zh": "中国", "ex": "Soy de China."}, {"es": "chino / china", "zh": "中国人（男/女）；中文", "ex": "Ella es china. Hablo chino."}, {"es": "España", "zh": "西班牙", "ex": "Quiero viajar a España."}, {"es": "español / española", "zh": "西班牙人（男/女）；西班牙语", "ex": "Mi profesora es española."}, {"es": "inglés", "zh": "英语；英国人", "ex": "Hablo inglés."}, {"es": "el idioma", "zh": "语言", "ex": "¿Qué idiomas hablas?"}, {"es": "el trabajo", "zh": "工作", "ex": "Busco trabajo."}, {"es": "¿A qué te dedicas?", "zh": "你是做什么工作的？", "ex": "—¿A qué te dedicas? —Soy ingeniero."}, {"es": "el profesor / la profesora", "zh": "老师", "ex": "El profesor es muy simpático."}, {"es": "el / la estudiante", "zh": "学生", "ex": "Soy estudiante de español."}, {"es": "el médico / la médica", "zh": "医生", "ex": "Mi madre es médica."}, {"es": "el ingeniero / la ingeniera", "zh": "工程师", "ex": "Mi hermano es ingeniero."}, {"es": "el camarero / la camarera", "zh": "服务员", "ex": "El camarero trae la cuenta."}, {"es": "el abogado / la abogada", "zh": "律师", "ex": "Mi amiga es abogada."}, {"es": "el enfermero / la enfermera", "zh": "护士", "ex": "Trabaja de enfermero en un hospital."}, {"es": "la empresa", "zh": "公司", "ex": "Trabajo en una empresa pequeña."}, {"es": "estar en paro", "zh": "失业", "ex": "Ahora estoy en paro."}, {"es": "buscar trabajo", "zh": "找工作", "ex": "Estoy buscando trabajo."}, {"es": "casado / casada", "zh": "已婚的", "ex": "Mi hermana está casada."}, {"es": "soltero / soltera", "zh": "单身的", "ex": "Soy soltero."}, {"es": "la familia", "zh": "家庭；家人", "ex": "Mi familia es pequeña."}, {"es": "el padre / la madre", "zh": "父亲 / 母亲", "ex": "Mi padre se llama Juan."}, {"es": "el hermano / la hermana", "zh": "兄弟 / 姐妹", "ex": "Tengo una hermana."}, {"es": "el hijo / la hija", "zh": "儿子 / 女儿", "ex": "Tienen dos hijos."}, {"es": "cero", "zh": "0", "ex": "Cero grados."}, {"es": "uno / una", "zh": "1", "ex": "Tengo un hermano y una hermana."}, {"es": "dos", "zh": "2", "ex": "Dos cafés, por favor."}, {"es": "tres", "zh": "3", "ex": "Tres personas."}, {"es": "cuatro", "zh": "4", "ex": "Somos cuatro en mi familia."}, {"es": "cinco", "zh": "5", "ex": "Cinco euros."}, {"es": "seis", "zh": "6", "ex": "A las seis."}, {"es": "siete", "zh": "7", "ex": "Siete días."}, {"es": "ocho", "zh": "8", "ex": "Ocho horas."}, {"es": "nueve", "zh": "9", "ex": "Nueve años."}, {"es": "diez", "zh": "10", "ex": "Diez minutos."}, {"es": "once", "zh": "11", "ex": "Once alumnos."}, {"es": "doce", "zh": "12", "ex": "Doce meses."}, {"es": "quince", "zh": "15", "ex": "Quince euros."}, {"es": "veinte", "zh": "20", "ex": "Tengo veinte años."}, {"es": "treinta", "zh": "30", "ex": "Treinta días."}, {"es": "cien", "zh": "100", "ex": "Cien personas."}]}];
+const EXAM = new Date("2027-05-22T09:00:00");
+const STEPS = [0, 1, 3, 7, 14, 30, 60]; // days per box
+const KEY = "a2cards.v1";
+const day = (d = new Date()) => { const x = new Date(d); x.setHours(0,0,0,0); return Math.floor(x.getTime() / 864e5); };
+
+let S = { cards: {}, newPerDay: 20, log: {} };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+// every word gives two cards: es→zh (r) and zh→es (p)
+const ALL = [];
+WEEKS.forEach(w => w.words.forEach((x, i) => {
+  ["r", "p"].forEach(t => ALL.push({ id: `w${w.week}-${i}-${t}`, week: w.week, t, ...x }));
+}));
+// interleave so a word's two directions are not back to back
+ALL.sort((a, b) => a.week - b.week || (a.t === b.t ? 0 : a.t === "r" ? -1 : 1) || 0);
+const order = []; WEEKS.forEach(w => { const r = ALL.filter(c => c.week === w.week && c.t === "r"), p = ALL.filter(c => c.week === w.week && c.t === "p");
+  r.forEach((c, i) => { order.push(c); if (i >= 3 && p[i - 3]) order.push(p[i - 3]); }); p.slice(Math.max(0, r.length - 3)).forEach(c => order.push(c)); });
+
+const today = () => day();
+const todayLog = () => S.log[today()] || (S.log[today()] = { n: 0, r: 0 });
+function queue() {
+  const t = today();
+  const due = order.filter(c => S.cards[c.id] && S.cards[c.id].due <= t);
+  const left = Math.max(0, S.newPerDay - todayLog().n);
+  const fresh = order.filter(c => !S.cards[c.id]).slice(0, left);
+  return [...due, ...fresh];
+}
+function streak() {
+  let s = 0, d = today();
+  if (!(S.log[d] && S.log[d].r)) d--;
+  while (S.log[d] && S.log[d].r) { s++; d--; }
+  return s;
+}
+function preview(c, g) {
+  const box = S.cards[c.id] ? S.cards[c.id].box : 0;
+  if (g === 0) return "今天再练";
+  const nb = g === 1 ? Math.max(1, box) : box + 1;
+  const d = STEPS[Math.min(nb, STEPS.length - 1)];
+  return d <= 1 ? "明天" : d + " 天后";
+}
+
+const app = document.getElementById("app");
+let Q = [], qi = 0, shown = false, total = 0;
+
+function speak(text) {
+  try {
+    const u = new SpeechSynthesisUtterance(text.replace(/\s*\/\s*/g, ", "));
+    u.lang = "es-ES"; u.rate = 0.9;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch (e) {}
+}
+const esc = s => String(s).replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
+
+function home() {
+  const q = queue(), learned = order.filter(c => S.cards[c.id]).length;
+  const days = Math.max(0, Math.ceil((EXAM - new Date()) / 864e5));
+  app.innerHTML = `
+    <header><h1>A2 <span>词卡</span></h1><div class="countdown">距 DELE A2<br>还有 <b>${days}</b> 天</div></header>
+    <div class="stats">
+      <div class="stat due"><b>${q.length}</b><small>今日待背</small></div>
+      <div class="stat"><b>${streak()}</b><small>连续天数</small></div>
+      <div class="stat"><b>${learned}</b><small>已学卡片</small></div>
+    </div>
+    <button class="primary" id="go" ${q.length ? "" : "disabled"}>${q.length ? "开始今天的学习" : "今天的任务完成了"}</button>
+    <p class="section-label">按周词库</p>
+    <div class="decks">${WEEKS.map(w => {
+      const cs = order.filter(c => c.week === w.week), seen = cs.filter(c => S.cards[c.id]).length;
+      return `<div class="deck"><span class="wk">第 ${String(w.week).padStart(2, "0")} 周</span><span class="nm">${esc(w.title)}</span><span class="ct">${seen}/${cs.length}</span><span class="bar"><i style="width:${cs.length ? seen / cs.length * 100 : 0}%"></i></span></div>`;
+    }).join("")}</div>
+    <div class="settings"><label for="npd">每天新卡片</label>
+      <select id="npd">${[10, 20, 30, 40].map(n => `<option ${n === S.newPerDay ? "selected" : ""}>${n}</option>`).join("")}</select></div>
+    <p class="note">每个词有两张卡：看西语想中文，看中文说西语。进度保存在这台设备的浏览器里。</p>`;
+  document.getElementById("go").onclick = () => { Q = queue(); qi = 0; total = Q.length; shown = false; study(); };
+  document.getElementById("npd").onchange = e => { S.newPerDay = +e.target.value; save(); home(); };
+}
+
+function study() {
+  if (qi >= Q.length) return finish();
+  const c = Q[qi], isNew = !S.cards[c.id];
+  const front = c.t === "r"
+    ? `<div class="dir">${isNew ? "新词 · " : ""}西 → 中</div><div class="es">${esc(c.es)}</div>`
+    : `<div class="dir">${isNew ? "新词 · " : ""}中 → 西</div><div class="zh">${esc(c.zh)}</div><div class="hint">先说出或写出西语，再翻面</div>`;
+  const back = c.t === "r"
+    ? `<hr><div class="zh">${esc(c.zh)}</div><div class="ex">${esc(c.ex)}</div>`
+    : `<hr><div class="es">${esc(c.es)}</div><div class="ex">${esc(c.ex)}</div>`;
+  app.innerHTML = `
+    <div class="study">
+      <div class="topbar"><button class="ghost" id="back">‹ 返回</button><div class="progress"><i style="width:${total ? qi / total * 100 : 0}%"></i></div><span class="left">${Q.length - qi}</span></div>
+      <div class="card">${front}${shown ? back : ""}
+        ${(c.t === "r" || shown) ? `<button class="say" id="say">▶ 听发音</button>` : ""}</div>
+      ${shown
+        ? `<div class="grades">
+            <button class="g0" data-g="0"><b>不记得</b><small>${preview(c, 0)}</small></button>
+            <button class="g1" data-g="1"><b>模糊</b><small>${preview(c, 1)}</small></button>
+            <button class="g2" data-g="2"><b>记得</b><small>${preview(c, 2)}</small></button></div>`
+        : `<button class="primary" id="flip">翻面</button>`}
+    </div>`;
+  document.getElementById("back").onclick = home;
+  const say = document.getElementById("say");
+  if (say) say.onclick = () => speak(shown && c.t === "r" ? c.ex : c.es);
+  if (!shown) document.getElementById("flip").onclick = () => { shown = true; study(); if (c.t === "p") speak(c.es); };
+  else app.querySelectorAll(".grades button").forEach(b => b.onclick = () => grade(c, +b.dataset.g));
+}
+
+function grade(c, g) {
+  const t = today(), lg = todayLog(), rec = S.cards[c.id];
+  if (!rec) lg.n++;
+  lg.r++;
+  const box = rec ? rec.box : 0;
+  if (g === 0) { S.cards[c.id] = { box: 0, due: t }; Q.push(c); }
+  else {
+    const nb = g === 1 ? Math.max(1, box) : box + 1;
+    S.cards[c.id] = { box: nb, due: t + STEPS[Math.min(nb, STEPS.length - 1)] };
+  }
+  save(); qi++; shown = false; study();
+}
+
+function finish() {
+  app.innerHTML = `<div class="done"><h2>¡Muy bien!</h2><p>今天的卡片都背完了，已连续学习 ${streak()} 天。</p><p>明天记得回来复习。</p><button class="primary" id="h">回到首页</button></div>`;
+  document.getElementById("h").onclick = home;
+}
+
+document.addEventListener("keydown", e => {
+  if (!document.querySelector(".study")) return;
+  if (e.key === " " && document.getElementById("flip")) { e.preventDefault(); document.getElementById("flip").click(); }
+  if (["1", "2", "3"].includes(e.key)) { const b = document.querySelector(`[data-g="${+e.key - 1}"]`); if (b) b.click(); }
+});
+home();
+</script>
+
+</body>
+</html>
