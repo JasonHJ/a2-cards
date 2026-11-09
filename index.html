@@ -74,6 +74,7 @@ hr{width:60%;border:0;border-top:1px dashed var(--line);margin:4px 0}
 .done h2{font-family:var(--display);font-size:26px;margin:0}
 .done p{color:var(--muted);margin:0}
 .note{font-size:12px;color:var(--muted);text-align:center;margin:0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;max-width:calc(100% - 32px);text-align:center;z-index:20}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -129,12 +130,36 @@ function preview(c, g) {
 const app = document.getElementById("app");
 let Q = [], qi = 0, shown = false, total = 0;
 
-function speak(text) {
+// Pick a Spanish voice explicitly; iOS loads voices late and ignores lang alone on some versions.
+let ES_VOICE = null;
+function pickVoice() {
   try {
-    const u = new SpeechSynthesisUtterance(text.replace(/\s*\/\s*/g, ", "));
-    u.lang = "es-ES"; u.rate = 0.9;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
+    const vs = speechSynthesis.getVoices() || [];
+    ES_VOICE = vs.find(v => /^es[-_]ES/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null;
   } catch (e) {}
+}
+try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {}
+function speak(text) {
+  if (!("speechSynthesis" in window)) { toast("这个浏览器不支持朗读，请用 Safari 打开"); return; }
+  try {
+    if (!ES_VOICE) pickVoice();
+    const u = new SpeechSynthesisUtterance(text.replace(/\s*\/\s*/g, ", "));
+    u.lang = ES_VOICE ? ES_VOICE.lang : "es-ES"; u.rate = 0.9; u.volume = 1;
+    if (ES_VOICE) u.voice = ES_VOICE;
+    // iOS drops an utterance queued right after cancel(); only cancel when something is playing.
+    if (speechSynthesis.speaking || speechSynthesis.pending) {
+      speechSynthesis.cancel();
+      setTimeout(() => speechSynthesis.speak(u), 120);
+    } else {
+      speechSynthesis.resume(); speechSynthesis.speak(u);
+    }
+    if (!ES_VOICE && speechSynthesis.getVoices().length) toast("手机里没有西班牙语语音，请按页面底部提示下载");
+  } catch (e) { toast("发音失败，请检查静音开关和音量"); }
+}
+function toast(msg) {
+  let t = document.getElementById("toast");
+  if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast"; document.body.appendChild(t); }
+  t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => { t.hidden = true; }, 3500);
 }
 const esc = s => String(s).replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 
@@ -156,7 +181,8 @@ function home() {
     }).join("")}</div>
     <div class="settings"><label for="npd">每天新卡片</label>
       <select id="npd">${[10, 20, 30, 40].map(n => `<option ${n === S.newPerDay ? "selected" : ""}>${n}</option>`).join("")}</select></div>
-    <p class="note">每个词有两张卡：看西语想中文，看中文说西语。进度保存在这台设备的浏览器里。</p>`;
+    <p class="note">每个词有两张卡：看西语想中文，看中文说西语。进度保存在这台设备的浏览器里。</p>
+    <p class="note">听不到发音？关掉 iPhone 侧面的静音开关并调大音量；仍然没有声音的话，到 设置 → 辅助功能 → 朗读内容 → 声音 → 西班牙语，下载一个"西班牙"语音。</p>`;
   document.getElementById("go").onclick = () => { Q = queue(); qi = 0; total = Q.length; shown = false; study(); };
   document.getElementById("npd").onchange = e => { S.newPerDay = +e.target.value; save(); home(); };
 }
